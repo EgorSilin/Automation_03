@@ -1,8 +1,7 @@
 import os
 import time
 import datetime
-
-# print(os.path.dirname(os.path.abspath(__file__)))
+import binascii
 
 
 def check_def_cfg(val1_inp, val2_inp, data_file_path_inp):
@@ -85,10 +84,34 @@ if __name__ == '__main__':
         if not is_in_def_cfg:
             if data_file in cfg_dict:
                 for cfg_path in cfg_dict[data_file]:
-                    print(cfg_path)
+                    print(f'Read config: {cfg_path}')  # comment for prod
+                    with open(cfg_path, 'r') as f:
+                        next(f)
+                        sig_list = []
+                        for cfg_line in f:
+                            stripped_cfg_line = cfg_line.rstrip('\n')
+                            sig_list.append(stripped_cfg_line)
+                            # print(stripped_cfg_line)
+                        print(sig_list)
+                        sig_list_2 = [[sig_list[i], sig_list[i + 1]] for i in range(0, len(sig_list) - 1, 2)]
+                        print(sig_list_2)
+                        for sig in sig_list_2:
+                            # print(sig)
+                            print(sig[0])
+                            print(sig[1])
+                            # print(int(sig[1], 16))
+                            print(data_file_path)
+                            ### HERE
+                            with open(data_file_path, 'rb') as ff:
+                                print(f'BIN BIN BIN {ff.read()}')
+                                hex_bytes = " ".join(['{:02X}'.format(byte) for byte in ff])
+                                print(f"HEX HEX HEX: {hex_bytes}")
 
+                            # print(hex(sig[1]))
+                            # pass
 
-        # find signature
+    # find signature
+
 
 
 
