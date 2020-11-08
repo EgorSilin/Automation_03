@@ -56,8 +56,18 @@ if __name__ == '__main__':
         print(f'KEY = {is_in_def_cfg}')
         # Check 2nd condition
         if not is_in_def_cfg:
-            for config_file in config_files_lst:
-                with open(f'{val2}{config_file}', 'r') as f:
-                    pass
+            pass
+
+        for config_file in config_files_lst:
+            config_file_path = f"{val2}{config_file}"
+            if not os.path.isfile(f'{config_file_path}'):
+                continue
+            if config_file_path == f'{val2}default.cfg':
+                continue
+            if os.path.splitext(config_file_path)[1] != '.cfg':
+                continue
+            with open(f'{val2}{config_file}', 'r') as f:
+                data_file_name = (f.readline()).rstrip('\n').lstrip('name:')
+                print(data_file_name)
 
 
