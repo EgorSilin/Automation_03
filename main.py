@@ -31,6 +31,31 @@ def check_def_cfg(val1_inp, val2_inp, data_file_path_inp):
     return file_in_def_cfg_key
 
 
+def take_cfg_dict(val2_inp):
+    """func build dict:
+    {data_file_name_01: [cfg_file_path_01, cfg_file_path_02],
+    data_file_name_02: [cfg_file_path_01, cfg_file_path_02]}"""
+    cfg_dict = {}
+    for config_file in config_files_lst:
+        config_file_path = f"{val2_inp}{config_file}"
+        if not os.path.isfile(f'{config_file_path}'):
+            continue
+        if config_file_path == f'{val2_inp}default.cfg':
+            continue
+        if os.path.splitext(config_file_path)[1] != '.cfg':
+            continue
+        with open(f'{val2_inp}{config_file}', 'r') as f:
+            data_file_name = (f.readline()).rstrip('\n').lstrip('name:')
+            print(data_file_name)
+            print(f'XXX: {val2_inp}{config_file}')
+            if data_file_name in cfg_dict:
+                cfg_dict[data_file_name].append(f'{val2_inp}{config_file}')
+            else:
+                cfg_dict[data_file_name] = []
+                cfg_dict[data_file_name].append(f'{val2_inp}{config_file}')
+    return cfg_dict
+
+
 if __name__ == '__main__':
     # время в минутах
     timeout = 100
@@ -42,6 +67,8 @@ if __name__ == '__main__':
 
     data_files_lst = sorted(os.listdir(val1))
     config_files_lst = sorted(os.listdir(val2))
+    cfg_dict = take_cfg_dict(val2)
+    print(cfg_dict)
     print(data_files_lst)
     print(config_files_lst)
     for data_file in data_files_lst:
@@ -56,18 +83,12 @@ if __name__ == '__main__':
         print(f'KEY = {is_in_def_cfg}')
         # Check 2nd condition
         if not is_in_def_cfg:
-            pass
+            if data_file in cfg_dict:
+                for cfg_path in cfg_dict[data_file]:
+                    print(cfg_path)
 
-        for config_file in config_files_lst:
-            config_file_path = f"{val2}{config_file}"
-            if not os.path.isfile(f'{config_file_path}'):
-                continue
-            if config_file_path == f'{val2}default.cfg':
-                continue
-            if os.path.splitext(config_file_path)[1] != '.cfg':
-                continue
-            with open(f'{val2}{config_file}', 'r') as f:
-                data_file_name = (f.readline()).rstrip('\n').lstrip('name:')
-                print(data_file_name)
+
+        # find signature
+
 
 
