@@ -34,7 +34,7 @@ def take_cfg_dict(val2_inp):
     """func build dict:
     {data_file_name_01: [cfg_file_path_01, cfg_file_path_02],
     data_file_name_02: [cfg_file_path_01, cfg_file_path_02]}"""
-    cfg_dict = {}
+    cfg_dict_in_f = {}
     for config_file in config_files_lst:
         config_file_path = f"{val2_inp}{config_file}"
         if not os.path.isfile(f'{config_file_path}'):
@@ -47,12 +47,12 @@ def take_cfg_dict(val2_inp):
             data_file_name = (f.readline()).rstrip('\n').lstrip('name:')
             print(data_file_name)
             print(f'XXX: {val2_inp}{config_file}')
-            if data_file_name in cfg_dict:
-                cfg_dict[data_file_name].append(f'{val2_inp}{config_file}')
+            if data_file_name in cfg_dict_in_f:
+                cfg_dict_in_f[data_file_name].append(f'{val2_inp}{config_file}')
             else:
-                cfg_dict[data_file_name] = []
-                cfg_dict[data_file_name].append(f'{val2_inp}{config_file}')
-    return cfg_dict
+                cfg_dict_in_f[data_file_name] = []
+                cfg_dict_in_f[data_file_name].append(f'{val2_inp}{config_file}')
+    return cfg_dict_in_f
 
 
 if __name__ == '__main__':
@@ -60,9 +60,11 @@ if __name__ == '__main__':
     timeout = 100
     timedelta_timeout = datetime.timedelta(minutes=timeout)
     # путь к папке с файлами (формат файлов либо текстовый либо архивный)
-    val1 = '/home/user/PythonProjects/Automation_03/val1_data_files/'
+    # val1 = '/home/user/PythonProjects/Automation_03/val1_data_files/'
+    val1 = '/home/user/PycharmProjects/Automation_03/val1_data_files/'
     # путь к папке с конфигами (файлы с расширением .cfg)
-    val2 = '/home/user/PythonProjects/Automation_03/val2_config_files/'
+    # val2 = '/home/user/PythonProjects/Automation_03/val2_config_files/'
+    val2 = '/home/user/PycharmProjects/Automation_03/val2_config_files/'
 
     data_files_lst = sorted(os.listdir(val1))
     config_files_lst = sorted(os.listdir(val2))
@@ -99,13 +101,16 @@ if __name__ == '__main__':
                             # print(sig)
                             print(sig[0])
                             print(sig[1])
-                            # print(int(sig[1], 16))
+                            hex_sig = binascii.hexlify(sig[1].encode('utf8'))  # from str to hex str
+                            print(hex_sig)
+                            unhex_sig = binascii.unhexlify(hex_sig).decode('utf8')  # from hex str to str
+                            print(unhex_sig)
                             print(data_file_path)
-                            ### HERE
                             with open(data_file_path, 'rb') as ff:
-                                print(f'BIN BIN BIN {ff.read()}')
-                                hex_bytes = " ".join(['{:02X}'.format(byte) for byte in ff])
-                                print(f"HEX HEX HEX: {hex_bytes}")
+                                file_bytes = ff.read()
+                                file_hex = file_bytes.hex()
+                                print(f'FILE IN BYTES: {file_bytes}, type: {type(file_bytes)}')
+                                print(f'FILE IN HEX: {file_hex}, type: {type(file_hex)}')
 
                             # print(hex(sig[1]))
                             # pass
