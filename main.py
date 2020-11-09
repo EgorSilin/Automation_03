@@ -61,11 +61,12 @@ def check_1st_cond(val1_inp, val2_inp, data_file_path_inp):
                 dif_mod_time = datetime.datetime.now() - abs_mod_datetime
                 # print(f"File modified {abs_mod_datetime} it's {dif_mod_time} ago.")  # comment for prod
                 if dif_mod_time < timedelta_timeout:
-                    print(f"File '{file_name}' \nmodified at {abs_mod_datetime} ({dif_mod_time} ago)."
+                    print(f"Ok! File '{file_name}' \nmodified at {abs_mod_datetime} ({dif_mod_time} ago)."
                           f" It's less than control period ({timedelta_timeout}).")  # comment for prod
                     break
                 else:
-                    print(f"OK! File '{file_name}' was not modify in control period = {timedelta_timeout}")
+                    print(f"ALARM! File '{file_name}' has not been modified "
+                          f"in control period = {timedelta_timeout}")
                     break
     return file_in_def_cfg_key
 
@@ -101,7 +102,7 @@ def check_2nd_cond(cfg_dict_inp, data_file_inp):
                         print(f'FILE IN BYTES: {file_bytes}, type: {type(file_bytes)}')  # comment for prod
                         print(f'FILE IN HEX: {file_hex}, type: {type(file_hex)}')  # comment for prod
                         if sig[1] in file_hex:
-                            print(f"Alarm! Signature '{sig[1]} detected in {data_file_path}!'")  # comment for prod
+                            print(f"Ok! Signature '{sig[1]} detected in {data_file_path}!'")  # comment for prod
                             # write log in csv
                             # with open("sig_det_log.csv", mode="a", encoding='utf-8') as w_file:
                             #     file_writer = csv.writer(w_file, delimiter=";", lineterminator="\r")
@@ -112,13 +113,12 @@ def check_2nd_cond(cfg_dict_inp, data_file_inp):
                                                                  sig[1],
                                                                  data_file_path])
                         else:
-                            print(f"Ok! Signature '{sig[1]}' was not detected in file '{data_file_path}'")
+                            print(f"Signature '{sig[1]}' was not detected in file '{data_file_path}' in this scan.")
                             # check csv log file
                             with open("sig_det_log.csv", mode='r', encoding='utf-8') as r_file:
                                 file_reader = csv.reader(r_file, delimiter=";")
                                 count = 0
-                                is_in_file_key = False
-                                datetime_lst = []
+                                sig_in_log_key_in_check_period = True
                                 for row in file_reader:
                                     # print(row[0], row[1], row[2])
                                     count += 1
@@ -127,12 +127,17 @@ def check_2nd_cond(cfg_dict_inp, data_file_inp):
                                     dif_row0_datetime = datetime.datetime.now() - row0_datetime
                                     # print(f'################{row0_datetime}')
                                     # print(f'################{datetime.timedelta(minutes=int(sig[0]))}')
-                                    # dif_row0_datetime > sig0_datetime
-                                    print(f"###row[1] ={row[1]}; sig[1] = {sig[1]}")
-                                    if row[1] == sig[1]:
-                                        datetime_lst.append(row[0])
-                                print(f"datetime_lst = {datetime_lst}")
-
+                                    # print(f"###row[1] ={row[1]}; sig[1] = {sig[1]}")
+                                    if row[1] == sig[1] and dif_row0_datetime <= sig0_datetime:
+                                        print(f"Signature {sig[1]} was in log {dif_row0_datetime} ago "
+                                              f"when check period {sig0_datetime}")
+                                        sig_in_log_key_in_check_period = True
+                                        break
+                                    else:
+                                        sig_in_log_key_in_check_period = False
+                                if not sig_in_log_key_in_check_period:
+                                    print(f"ALARM! Signature {sig[1]} has not been in file "
+                                          f"for the check period = {sig[0]}")
                                 print(f'Всего в файле {count} строк.')
                             # END check csv file
     else:
