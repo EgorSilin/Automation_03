@@ -50,13 +50,14 @@ def check_1st_cond(val1_inp, val2_inp, data_file_path_inp):
                           f" It's less than control period ({timedelta_timeout}).")  # comment for prod
                     break
                 else:
-                    print(f'File was not modify in control period = {timedelta_timeout}')
+                    print(f"OK! File '{file_name}' was not modify in control period = {timedelta_timeout}")
                     break
     return file_in_def_cfg_key
 
 
 def check_2nd_cond(cfg_dict_inp, data_file_inp):
-    # Check 2nd condition
+    """Func checking 2nd condition"""
+    # print(f'Check 2nd condition!')
     if data_file_inp in cfg_dict_inp:
         for cfg_path in cfg_dict_inp[data_file_inp]:
             print(f'Read config: {cfg_path}')  # comment for prod
@@ -86,7 +87,9 @@ def check_2nd_cond(cfg_dict_inp, data_file_inp):
                         print(f'FILE IN BYTES: {file_bytes}, type: {type(file_bytes)}')  # comment for prod
                         print(f'FILE IN HEX: {file_hex}, type: {type(file_hex)}')  # comment for prod
                         if sig[1] in file_hex:
-                            print(f"Alarm! Signature '{sig[1]} detected in {data_file_path}!'")
+                            print(f"Alarm! Signature '{sig[1]} detected in {data_file_path}!'")  # comment for prod
+                        else:
+                            print(f"Ok! Signature '{sig[1]}' was not detected in file '{data_file_path}'")
 
 
 if __name__ == '__main__':
