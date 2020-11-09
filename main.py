@@ -99,8 +99,22 @@ def check_2nd_cond(cfg_dict_inp, data_file_inp):
                             with open("sig_det_log.csv", mode='r', encoding='utf-8') as r_file:
                                 file_reader = csv.reader(r_file, delimiter=";")
                                 count = 0
+                                is_in_file_key = False
+                                datetime_lst = []
                                 for row in file_reader:
-                                    print(row[0], row[1], row[2])
+                                    # print(row[0], row[1], row[2])
+                                    count += 1
+                                    row0_datetime = datetime.datetime.strptime(row[0], "%Y-%m-%d %H:%M:%S.%f")
+                                    sig0_datetime = datetime.timedelta(minutes=int(sig[0]))
+                                    dif_row0_datetime = datetime.datetime.now() - row0_datetime
+                                    # print(f'################{row0_datetime}')
+                                    # print(f'################{datetime.timedelta(minutes=int(sig[0]))}')
+                                    # dif_row0_datetime > sig0_datetime
+                                    print(f"###row[1] ={row[1]}; sig[1] = {sig[1]}")
+                                    if row[1] == sig[1]:
+                                        datetime_lst.append(row[0])
+                                print(f"datetime_lst = {datetime_lst}")
+
                                 print(f'Всего в файле {count} строк.')
                             # END check csv file
     else:
