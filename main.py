@@ -30,6 +30,20 @@ def take_cfg_dict(val2_inp):
     return cfg_dict_in_f
 
 
+def write_to_cvs_top(file_name: str, cvs_str_inp: list):
+    row_lst = []
+    if os.path.isfile(f'{file_name}'):
+        with open(file_name, mode='r', encoding='utf-8') as r_file:
+            file_reader = csv.reader(r_file, delimiter=";")
+            for row in file_reader:
+                row_lst.append(row)
+    with open(file_name, mode="w", encoding='utf-8') as w_file:
+        file_writer = csv.writer(w_file, delimiter=";", lineterminator="\r")
+        file_writer.writerow([cvs_str_inp[0], cvs_str_inp[1], cvs_str_inp[2]])
+        for row in row_lst:
+            file_writer.writerow([row[0], row[1], row[2]])
+
+
 def check_1st_cond(val1_inp, val2_inp, data_file_path_inp):
     """Func checking 1st condition"""
     print(f'Check 1st condition.')  # comment for prod
@@ -60,17 +74,18 @@ def check_2nd_cond(cfg_dict_inp, data_file_inp):
     """Func checking 2nd condition"""
     print(f'Check 2nd condition!')
     if data_file_inp in cfg_dict_inp:
+        # find cfg files for each data files
         for cfg_path in cfg_dict_inp[data_file_inp]:
             print(f'Read config: {cfg_path}')  # comment for prod
             with open(cfg_path, 'r') as f:
                 next(f)
                 sig_list = []
+                # scan cfg files to find timeout and signature
                 for cfg_line in f:
                     stripped_cfg_line = cfg_line.rstrip('\n')
                     sig_list.append(stripped_cfg_line)
-                    # print(stripped_cfg_line)
-                print(f"SIG 1xLIST: {sig_list}")
                 sig_list_2 = [[sig_list[i], sig_list[i + 1]] for i in range(0, len(sig_list) - 1, 2)]
+                print(f"SIG 1xLIST: {sig_list}")
                 print(f"SIG 2xLIST: {sig_list_2}")
                 for sig in sig_list_2:
                     print(f"SIG '{sig[1]}' should be in {sig[0]} minutes")
@@ -88,11 +103,14 @@ def check_2nd_cond(cfg_dict_inp, data_file_inp):
                         if sig[1] in file_hex:
                             print(f"Alarm! Signature '{sig[1]} detected in {data_file_path}!'")  # comment for prod
                             # write log in csv
-                            with open("sig_det_log.csv", mode="a", encoding='utf-8') as w_file:
-                                file_writer = csv.writer(w_file, delimiter=";", lineterminator="\r")
-                                file_writer.writerow([datetime.datetime.now(),
-                                                      sig[1],
-                                                      data_file_path])
+                            # with open("sig_det_log.csv", mode="a", encoding='utf-8') as w_file:
+                            #     file_writer = csv.writer(w_file, delimiter=";", lineterminator="\r")
+                            #     file_writer.writerow([datetime.datetime.now(),
+                            #                           sig[1],
+                            #                           data_file_path])
+                            write_to_cvs_top("sig_det_log.csv", [datetime.datetime.now(),
+                                                                 sig[1],
+                                                                 data_file_path])
                         else:
                             print(f"Ok! Signature '{sig[1]}' was not detected in file '{data_file_path}'")
                             # check csv log file

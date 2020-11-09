@@ -1,5 +1,0 @@
-name:file_01_TXT
-15
-XXX
-1
-YYY
