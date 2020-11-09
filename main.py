@@ -4,7 +4,32 @@ import datetime
 import binascii
 
 
-def check_def_cfg(val1_inp, val2_inp, data_file_path_inp):
+def take_cfg_dict(val2_inp):
+    """func build dict:
+    {data_file_name_01: [cfg_file_path_01, cfg_file_path_02],
+    data_file_name_02: [cfg_file_path_01, cfg_file_path_02]}"""
+    cfg_dict_in_f = {}
+    for config_file in config_files_lst:
+        config_file_path = f"{val2_inp}{config_file}"
+        if not os.path.isfile(f'{config_file_path}'):
+            continue
+        if config_file_path == f'{val2_inp}default.cfg':
+            continue
+        if os.path.splitext(config_file_path)[1] != '.cfg':
+            continue
+        with open(f'{val2_inp}{config_file}', 'r') as f:
+            data_file_name = (f.readline()).rstrip('\n').lstrip('name:')
+            print(data_file_name)
+            print(f'XXX: {val2_inp}{config_file}')
+            if data_file_name in cfg_dict_in_f:
+                cfg_dict_in_f[data_file_name].append(f'{val2_inp}{config_file}')
+            else:
+                cfg_dict_in_f[data_file_name] = []
+                cfg_dict_in_f[data_file_name].append(f'{val2_inp}{config_file}')
+    return cfg_dict_in_f
+
+
+def check_1st_cond(val1_inp, val2_inp, data_file_path_inp):
     """Func checking 1st condition"""
     # print(f'Check file in default.cfg')  # comment for prod
     file_in_def_cfg_key = False
@@ -29,30 +54,10 @@ def check_def_cfg(val1_inp, val2_inp, data_file_path_inp):
                     break
     return file_in_def_cfg_key
 
+def check_2nd_cond(val1_inp, val2_inp, data_file_path_inp, key):
+    pass
 
-def take_cfg_dict(val2_inp):
-    """func build dict:
-    {data_file_name_01: [cfg_file_path_01, cfg_file_path_02],
-    data_file_name_02: [cfg_file_path_01, cfg_file_path_02]}"""
-    cfg_dict_in_f = {}
-    for config_file in config_files_lst:
-        config_file_path = f"{val2_inp}{config_file}"
-        if not os.path.isfile(f'{config_file_path}'):
-            continue
-        if config_file_path == f'{val2_inp}default.cfg':
-            continue
-        if os.path.splitext(config_file_path)[1] != '.cfg':
-            continue
-        with open(f'{val2_inp}{config_file}', 'r') as f:
-            data_file_name = (f.readline()).rstrip('\n').lstrip('name:')
-            print(data_file_name)
-            print(f'XXX: {val2_inp}{config_file}')
-            if data_file_name in cfg_dict_in_f:
-                cfg_dict_in_f[data_file_name].append(f'{val2_inp}{config_file}')
-            else:
-                cfg_dict_in_f[data_file_name] = []
-                cfg_dict_in_f[data_file_name].append(f'{val2_inp}{config_file}')
-    return cfg_dict_in_f
+
 
 
 if __name__ == '__main__':
@@ -80,7 +85,7 @@ if __name__ == '__main__':
             continue
         ###################
         print(f'\nCheck file: {data_file_path}')
-        is_in_def_cfg = check_def_cfg(val1, val2, data_file_path)
+        is_in_def_cfg = check_1st_cond(val1, val2, data_file_path)
         print(f'KEY = {is_in_def_cfg}')
         # Check 2nd condition
         if not is_in_def_cfg:
@@ -98,23 +103,26 @@ if __name__ == '__main__':
                         sig_list_2 = [[sig_list[i], sig_list[i + 1]] for i in range(0, len(sig_list) - 1, 2)]
                         print(sig_list_2)
                         for sig in sig_list_2:
-                            # print(sig)
+                            print(cfg_path)
                             print(sig[0])
-                            print(sig[1])
-                            hex_sig = binascii.hexlify(sig[1].encode('utf8'))  # from str to hex str
-                            print(hex_sig)
-                            unhex_sig = binascii.unhexlify(hex_sig).decode('utf8')  # from hex str to str
-                            print(unhex_sig)
+                            print(sig[1])  # should be hex str
+                            '''XXX = 585858, YYY = 595959, ZZZ = 5a5a5a'''
+                            # hex_sig = binascii.hexlify(sig[1].encode('utf8'))  # from str to hex str
+                            # print(hex_sig)
+                            # unhex_sig = binascii.unhexlify(hex_sig).decode('utf8')  # from hex str to str
+                            # print(unhex_sig)
                             print(data_file_path)
                             with open(data_file_path, 'rb') as ff:
                                 file_bytes = ff.read()
                                 file_hex = file_bytes.hex()
                                 print(f'FILE IN BYTES: {file_bytes}, type: {type(file_bytes)}')
                                 print(f'FILE IN HEX: {file_hex}, type: {type(file_hex)}')
+                                if sig[1] in file_hex:
+                                    print(f"Alarm! Signature '{sig[1]} detected in {data_file_path}!'")
 
                             # print(hex(sig[1]))
                             # pass
-
+        ### END 2nd cond ##################################
     # find signature
 
 
