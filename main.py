@@ -47,10 +47,10 @@ def check_1st_cond(val1_inp, val2_inp, data_file_path_inp):
                 # print(f"File modified {abs_mod_datetime} it's {dif_mod_time} ago.")  # comment for prod
                 if dif_mod_time < timedelta_timeout:
                     print(f"File '{file_name}' \nmodified at {abs_mod_datetime} ({dif_mod_time} ago)."
-                          f" It's more than control period ({timedelta_timeout}).")
+                          f" It's less than control period ({timedelta_timeout}).")  # comment for prod
                     break
                 else:
-                    # print(f'File was not modify in control period = {timedelta_timeout}')  # comment for prod
+                    print(f'File was not modify in control period = {timedelta_timeout}')
                     break
     return file_in_def_cfg_key
 
@@ -83,8 +83,8 @@ def check_2nd_cond(cfg_dict_inp, data_file_inp):
                     with open(data_file_path, 'rb') as ff:
                         file_bytes = ff.read()
                         file_hex = file_bytes.hex()
-                        print(f'FILE IN BYTES: {file_bytes}, type: {type(file_bytes)}')
-                        print(f'FILE IN HEX: {file_hex}, type: {type(file_hex)}')
+                        print(f'FILE IN BYTES: {file_bytes}, type: {type(file_bytes)}')  # comment for prod
+                        print(f'FILE IN HEX: {file_hex}, type: {type(file_hex)}')  # comment for prod
                         if sig[1] in file_hex:
                             print(f"Alarm! Signature '{sig[1]} detected in {data_file_path}!'")
 
