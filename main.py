@@ -164,3 +164,4 @@ if __name__ == '__main__':
         # print(f'Data file in default.cfg? {is_in_def_cfg}')  # comment for prod
         if not is_in_def_cfg:
             check_2nd_cond(cfg_dict, data_file)
+        # FINISHED
